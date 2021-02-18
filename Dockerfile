@@ -6,17 +6,14 @@ ARG ALPINE_GLIBC_PACKAGE_VERSION="2.32-r0"
 ENV LANG=C.UTF-8
 ENV TZ=Asia/Shanghai
 
-# Here we install GNU libc (aka glibc) and set C.UTF-8 locale as default.
-
 RUN ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     apk add --no-cache --virtual=.build-dependencies wget ca-certificates libstdc++ tzdata && \
-    update-ca-certificates && \
     cp /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo "$TZ" > /etc/timezone && \
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
-    wget \
+    wget --no-check-certificate \
         "$ALPINE_GLIBC_PACKAGE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_PACKAGE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_PACKAGE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
@@ -36,4 +33,7 @@ RUN ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
     rm \
         "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    \
+    mv /usr/glibc-compat/lib/ld-linux-x86-64.so.2 /usr/glibc-compat/lib/ld-linux-x86-64.so && \
+    ln -s /usr/glibc-compat/lib/ld-linux-x86-64.so /usr/glibc-compat/lib/ld-linux-x86-64.so.2
