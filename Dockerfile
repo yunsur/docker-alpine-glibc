@@ -1,7 +1,7 @@
 FROM alpine:3.13
 
 ARG ALPINE_GLIBC_PACKAGE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download"
-ARG ALPINE_GLIBC_PACKAGE_VERSION="2.32-r0"
+ARG ALPINE_GLIBC_PACKAGE_VERSION="2.33-r0"
 
 ENV LANG=C.UTF-8
 ENV TZ=Asia/Shanghai
