@@ -37,4 +37,18 @@ RUN ALPINE_GLIBC_BASE_PKG_FILENAME="glibc-$ALPINE_GLIBC_PKG_VERSION.apk" && \
     rm \
         "$ALPINE_GLIBC_BASE_PKG_FILENAME" \
         "$ALPINE_GLIBC_BIN_PKG_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PKG_FILENAME"
+        "$ALPINE_GLIBC_I18N_PKG_FILENAME" && \
+    \
+    apk add --no-cache --virtual .gettext gettext && \
+    mv /usr/bin/envsubst /tmp/ && \
+    \
+    runDeps="$( \
+        scanelf --needed --nobanner /tmp/envsubst \
+            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+            | sort -u \
+            | xargs -r apk info --installed \
+            | sort -u \
+    )" && \
+    apk add --no-cache $runDeps && \
+    apk del .gettext && \
+    mv /tmp/envsubst /usr/local/bin/
